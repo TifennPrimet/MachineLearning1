@@ -30,11 +30,24 @@ def split(key, value, df):
     return: left and right dataframe
     >>> len(split('sepal width (cm)', 3.0, df)[0])
     57
- 
     """
     left = df[df[key] < value]
     right = df[df[key] >= value]
     return left, right
 
+def gini_coef(left, right):
+    """
+    left: left dataframe
+    right: right dataframe
+    return: gini coefficient
+    >>> gini_coef(split('sepal width (cm)', 3.0, df)[0], split('sepal width (cm)', 3.0, df)[1])
+    0.47119999999999995
+    """
+    return 1-((len(left)/len(left+right))**2 + (len(right)/len(left+right))**2)
 
-doctest.testmod()
+
+
+
+
+if __name__ == "__main__":
+    doctest.testmod()
