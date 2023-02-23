@@ -137,20 +137,73 @@ class TreeNode:
 
 
 class DecisionTree:
-    def __init__(self, max_depth=None, min_samples=1):
+    def __init__(self, max_depth = None, min_samples = 1):
+        """
+        tree (TreeNode): root of the tree
+        max_depth (int): maximum depth of the tree
+        min_samples (int): minimum number of samples in a leaf
+        """
         self.tree = TreeNode()
         self.max_depth = max_depth
         self.min_samples = min_samples 
     
     def extend_node(self, node, df, y_col):
-        pass
+        """
+        node (TreeNode): node to extend
+        df (dataframe): dataframe to split
+        y_col (string): name of the column to predict (column class)
+        """
+        # if the node is a leaf
+        if node.is_leaf: 
+            return # we reached the end of the branch
+        # if the node is not a leaf
+        else:
+            # if the node is not a leaf and the maximum depth is reached
+            if self.max_depth is not None and node.depth >= self.max_depth:
+                node.is_leaf = True
+                return # we reached the end of the branch
+            # if the number of sample in the node is less than the minimum number of sample
+            elif len(df) <= self.min_samples:
+                node.is_leaf = True
+                return
+            # if the node is not a leaf and the maximum depth is not reached and 
+            # the number of sample in the node is greater than the minimum number of sample
+            else:
+                # we split the node
+                split = best_split(df)
+                node.split_col = split[0]
+                node.split_value = split[1]
+                left, right = split(node.split_col, node.split_value, df)
+                # if the split is not possible
+                if len(left) == 0 or len(right) == 0:
+                    node.is_leaf = True
+                    return
+                # if the split is possible
+                else:
+                    # we create the left child
+                    node.left = TreeNode()
+                    node.left.depth = node.depth + 1
+                    # we create the right child
+                    node.right = TreeNode()
+                    node.right.depth = node.depth + 1
+                    # we extend the left child
+                    self.extend_node(node.left, left, y_col)
+                    # we extend the right child
+                    self.extend_node(node.right, right, y_col)
+                    return
 
     def fit(self, df, y_col):
-        pass
+        """
+        df (dataframe): dataframe to split
+        y_col (string): name of the column to predict (column class)
+        """
+        self.tree.depth = 0
+        self.extend_node(self.tree, df, y_col)
 
 
     def predict(self, new_df):
         pass
+
       
 
 
@@ -184,4 +237,6 @@ if __name__ == "__main__":
     print(split_value(dfClasse, 'petal width (cm)'))
     print(best_split_for_all(dfClasse))
     print(best_split(dfClasse))
+    Tree1 = DecisionTree(1,1)
+    Tree1.fit(dfClasse, 'class')
 
