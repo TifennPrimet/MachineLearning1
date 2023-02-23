@@ -76,12 +76,14 @@ def gini_impurity(df):
     resultGini = []
     numKey = 0
     for key in data.keys():
+        print('key',key)
         valeurs = split_value(df, key)
         numSeuil = 0
         resultGiniInter = []
         for seuil in valeurs:
             left, right = split(key, seuil, df)
             resultGiniInter.append(gini_index(left, right))
+            print('gini',gini_index(left, right))
             numSeuil += 1
         resultGini.append(resultGiniInter)
         numKey += 1
@@ -95,6 +97,7 @@ def best_split_for_all(df):
     """
     data = df.drop(['class'], axis=1)
     resultGini = gini_impurity(df)
+    print('RESULT',resultGini)
     result = np.zeros((len(data.keys()),2))
     numKey = 0
     for key in data.keys():
@@ -109,7 +112,9 @@ def best_split(df):
     scoreGini = result[:,1]
     value = result[:,0]
     minIndex = np.argmin(scoreGini)
-    return np.array([df.keys()[minIndex],value[minIndex],scoreGini[minIndex]])
+    return (df.keys()[minIndex],value[minIndex],scoreGini[minIndex])
+
+    
 
 
 class TreeNode:
@@ -170,27 +175,37 @@ class DecisionTree:
             # the number of sample in the node is greater than the minimum number of sample
             else:
                 # we split the node
-                split = best_split(df)
-                node.split_col = split[0]
-                node.split_value = split[1]
-                left, right = split(node.split_col, node.split_value, df)
-                # if the split is not possible
-                if len(left) == 0 or len(right) == 0:
+                node.proba = df['class'].value_counts(normalize = True)
+                node.main_class = node.proba.argmax()
+                col, val, gini = best_split(df)
+                print('resultat du split',col,val,gini)
+                if gini == 0.0:
                     node.is_leaf = True
-                    return
-                # if the split is possible
                 else:
-                    # we create the left child
-                    node.left = TreeNode()
-                    node.left.depth = node.depth + 1
-                    # we create the right child
-                    node.right = TreeNode()
-                    node.right.depth = node.depth + 1
-                    # we extend the left child
-                    self.extend_node(node.left, left, y_col)
-                    # we extend the right child
-                    self.extend_node(node.right, right, y_col)
-                    return
+                    node.split_col = col
+                    node.split_value = val
+                    left, right = split(node.split_col, node.split_value, df)
+                    # if the split is not possible
+                    if len(left) == 0 or len(right) == 0:
+                        node.is_leaf = True
+                        return
+                    # if the split is possible
+                    else:
+                        # we create the left child
+                        node.left = TreeNode()
+                        node.left.depth = node.depth + 1
+                        # we create the right child
+                        node.right = TreeNode()
+                        node.right.depth = node.depth + 1
+                        # we extend the left child
+                        print('################## Enfant 1')
+                        print('left',left.shape)
+                        print('right',right.shape)
+                        self.extend_node(node.left, left, y_col)
+                        # we extend the right child
+                        print('################## Enfant 2')
+                        self.extend_node(node.right, right, y_col)
+                        return
 
     def fit(self, df, y_col):
         """
@@ -237,6 +252,7 @@ if __name__ == "__main__":
     print(split_value(dfClasse, 'petal width (cm)'))
     print(best_split_for_all(dfClasse))
     print(best_split(dfClasse))
-    Tree1 = DecisionTree(1,1)
+    print('---------------------------------------------------------')
+    Tree1 = DecisionTree(5,1)
     Tree1.fit(dfClasse, 'class')
 
