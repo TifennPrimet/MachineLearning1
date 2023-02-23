@@ -5,7 +5,27 @@ import doctest
 
 from sklearn import datasets
 
-# creation of the ginni impurity for the decision tree
+
+def split_value(df, key):
+    """"
+    function wich create a vector of threshold possible for a feature
+    df: dataframe
+    key: column name
+    return: vector of threshold
+    """
+
+    # we extract the column
+    data = df[key]
+    # we sort the unique value of the column
+    data = np.sort(data.unique())
+    # we create a vector of threshold equal to the mean of two consecutive values
+    result = np.zeros(len(data)-1)
+    for i in range(len(data)-1):
+        result[i] = (data[i] + data[i+1])/2
+    return result
+
+
+
 def split(key, value, df):
     """ 
     key: column name
