@@ -83,5 +83,5 @@ if __name__ == "__main__":
     # plt.ylabel('petal length (cm)')
     # plt.title('Iris dataset')
     # plt.show()
-    print(gini_impurity(dfClasse, 10))
-    print(best_split(dfClasse, 10))
+    print(gini_impurity(df, 10))
+    print(best_split(df, 10))
