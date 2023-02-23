@@ -66,7 +66,7 @@ def gini_index(left, right):
     return gini
 
 
-def gini_impurity(df, nb):
+def gini_impurity(df):
     """
     df: dataframe
     nb: number of threshold
@@ -87,14 +87,14 @@ def gini_impurity(df, nb):
         numKey += 1
     return resultGini
 
-def best_split(df, nb = 50):
+def best_split_for_all(df):
     """
     df: dataframe
     nb: number of threshold
     return: best split for each feature
     """
     data = df.drop(['class'], axis=1)
-    resultGini = gini_impurity(df, nb)
+    resultGini = gini_impurity(df)
     result = np.zeros((len(data.keys()),2))
     numKey = 0
     for key in data.keys():
@@ -103,6 +103,55 @@ def best_split(df, nb = 50):
         result[numKey,1] = resultGini[numKey][minIndex]
         numKey += 1
     return result
+
+def best_split(df):
+    result = best_split_for_all(df)
+    scoreGini = result[:,1]
+    value = result[:,0]
+    minIndex = np.argmin(scoreGini)
+    return np.array([df.keys()[minIndex],value[minIndex],scoreGini[minIndex]])
+
+
+class TreeNode:
+    def __init__(self):
+        """
+        proba (list or array or dataframe): list of all the frequencies encounter
+        main_class: class the most represent with the frequencies
+        depth: depth in the tree
+        is_leaf: if the node is terminal or not
+        split_col: name of the column used to split
+        split_value: value of the split
+
+        left: child node
+        right: child node
+        """
+        self.proba = None
+        self.main_class = None
+        self.depth = None
+        self.is_leaf = False
+        self.split_col = None
+        self.split_value = None
+        
+        self.left = None
+        self.right = None
+
+
+class DecisionTree:
+    def __init__(self, max_depth=None, min_samples=1):
+        self.tree = TreeNode()
+        self.max_depth = max_depth
+        self.min_samples = min_samples 
+    
+    def extend_node(self, node, df, y_col):
+        pass
+
+    def fit(self, df, y_col):
+        pass
+
+
+    def predict(self, new_df):
+        pass
+      
 
 
 if __name__ == "__main__":
@@ -133,4 +182,6 @@ if __name__ == "__main__":
     print('coeff',gini_index(left,right))
     # print(gini_impurity(df, 10))
     print(split_value(dfClasse, 'petal width (cm)'))
+    print(best_split_for_all(dfClasse))
     print(best_split(dfClasse))
+
