@@ -73,15 +73,17 @@ def gini_impurity(df, nb):
     return: gini impurity for each feature
     """
     data = df.drop(['class'], axis=1)
-    resultGini = np.zeros((len(data.keys()), nb))
+    resultGini = []
     numKey = 0
     for key in data.keys():
-        valeurs = np.linspace(min(data[key]), max(data[key]), nb)
+        valeurs = split_value(df, key)
         numSeuil = 0
+        resultGiniInter = []
         for seuil in valeurs:
             left, right = split(key, seuil, df)
-            resultGini[numKey, numSeuil] =  gini_index(left, right)
+            resultGiniInter.append(gini_index(left, right))
             numSeuil += 1
+        resultGini.append(resultGiniInter)
         numKey += 1
     return resultGini
 
@@ -96,9 +98,9 @@ def best_split(df, nb = 50):
     result = np.zeros((len(data.keys()),2))
     numKey = 0
     for key in data.keys():
-        minIndex = np.argmin(resultGini[numKey, :])
-        result[numKey,0] = np.linspace(min(df[key]), max(df[key]), nb)[minIndex]
-        result[numKey,1] = resultGini[numKey,minIndex]
+        minIndex = np.argmin(resultGini[numKey])
+        result[numKey,0] = split_value(df, key)[minIndex]
+        result[numKey,1] = resultGini[numKey][minIndex]
         numKey += 1
     return result
 
@@ -130,4 +132,5 @@ if __name__ == "__main__":
     print(f"Right: {len(right)}")
     print('coeff',gini_index(left,right))
     # print(gini_impurity(df, 10))
+    print(split_value(dfClasse, 'petal width (cm)'))
     print(best_split(dfClasse))
