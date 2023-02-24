@@ -15,15 +15,16 @@ def split_value(df, key):
     """
     # we extract the column
     data = df[key]
-    print('data',data)
-    print('fin')
     # we sort the unique value of the column
-    data = np.sort(data)
-    # we create a vector of threshold equal to the mean of two consecutive values
-    result = np.zeros(len(data)-1)
-    for i in range(len(data)-1):
-        result[i] = (data[i] + data[i+1])/2
-    return result
+    data = np.sort(data.unique())
+    if data.shape[0] == 1:
+        return [data[0]]
+    else:
+        # we create a vector of threshold equal to the mean of two consecutive values
+        result = np.zeros(len(data)-1)
+        for i in range(len(data)-1):
+            result[i] = (data[i] + data[i+1])/2
+        return result
 
 
 
@@ -76,7 +77,6 @@ def gini_impurity(df):
     data = df.drop(['class'], axis=1)
     result_gini = []
     for key in data.keys():
-        print('key',key)
         valeurs = split_value(df, key)
         # print('values',valeurs)
         result_gini_inter = []
@@ -95,7 +95,6 @@ def best_split_for_all(df):
     """
     data = df.drop(['class'], axis=1)
     result_gini = gini_impurity(df)
-    print('RESULT',result_gini)
     result = np.zeros((len(data.keys()),2))
     number_key = 0
     for key in data.keys():
@@ -180,7 +179,7 @@ class DecisionTree:
                 node.proba = df['class'].value_counts(normalize = True)
                 node.main_class = node.proba.argmax()
                 col, val, gini = best_split(df)
-                # print('resultat du split',col,val,gini)
+                print('resultat du split',col,val,gini)
                 if gini == 0.0:
                     node.is_leaf = True
                 else:
@@ -200,12 +199,8 @@ class DecisionTree:
                         node.right = TreeNode()
                         node.right.depth = node.depth + 1
                         # we extend the left child
-                        # print('################## Enfant 1')
-                        # print('left',left.shape)
-                        # print('right',right.shape)
                         self.extend_node(node.left, left, y_col)
                         # we extend the right child
-                        # print('################## Enfant 2')
                         self.extend_node(node.right, right, y_col)
                         return
 
@@ -234,12 +229,20 @@ if __name__ == "__main__":
     # we create a copy of the dataframe to add the class
     df_classe = df.copy()
     df_classe['class'] = data.target
-    print(df_classe.iloc[70])
+    # print(df_classe)
 
     #visual 2D display of the petal lenght according to the sepal width
     plt.figure()
-    plt.scatter(df['sepal width (cm)'], df['petal length (cm)'], c = data.target)
-    plt.xlabel('sepal width (cm)')
+    x = df['petal width (cm)']
+    y = df['petal length (cm)']
+    plt.scatter(x, y, c = data.target)
+    plt.plot(x,2.45*np.ones(len(x))) # Premier split
+    plt.plot(1.75*np.ones(len(y)),y) # Deuxième split
+    plt.plot(x,4.85*np.ones(len(x))) # Troisième split
+    plt.plot(x,4.95*np.ones(len(x))) # Quatrième split
+    plt.plot(1.55*np.ones(len(y)),y) # Cinquième split
+    plt.plot()
+    plt.xlabel('petal width (cm)')
     plt.ylabel('petal length (cm)')
     plt.title('Iris dataset')
     # plt.show()
@@ -251,10 +254,10 @@ if __name__ == "__main__":
     print(f"Right: {len(right)}")
     print('coeff',gini_index(left,right))
     # print(gini_impurity(df, 10))
-    print(split_value(df_classe, 'petal width (cm)'))
+    # print(split_value(df_classe, 'petal width (cm)'))
     print(best_split_for_all(df_classe))
     print(best_split(df_classe))
     print('---------------------------------------------------------')
-    Tree1 = DecisionTree(5,1)
+    Tree1 = DecisionTree()
     Tree1.fit(df_classe, 'class')
 
