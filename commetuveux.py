@@ -166,10 +166,12 @@ class DecisionTree:
         else:
             # if the node is not a leaf and the maximum depth is reached
             if self.max_depth is not None and node.depth >= self.max_depth:
+                print('Profondeur max atteinte')
                 node.is_leaf = True
                 return # we reached the end of the branch
             # if the number of sample in the node is less than the minimum number of sample
             elif len(df) <= self.min_samples:
+                print('Echantillon insuffisant')
                 node.is_leaf = True
                 return
             # if the node is not a leaf and the maximum depth is not reached and 
@@ -181,6 +183,7 @@ class DecisionTree:
                 col, val, gini = best_split(df)
                 print('resultat du split',col,val,gini)
                 if gini == 0.0:
+                    print('Le noeud est pur')
                     node.is_leaf = True
                 else:
                     node.split_col = col
@@ -188,6 +191,7 @@ class DecisionTree:
                     left, right = split(node.split_col, node.split_value, df)
                     # if the split is not possible
                     if len(left) == 0 or len(right) == 0:
+                        print('Le split est impossible')
                         node.is_leaf = True
                         return
                     # if the split is possible
