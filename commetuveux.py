@@ -13,7 +13,6 @@ def split_value(df, key):
     key: column name
     return: vector of threshold
     """
-
     # we extract the column
     data = df[key]
     print('data',data)
@@ -49,9 +48,9 @@ def gini_group(y):
     return: gini coefficient 
     """
     # Computation of the frequency of the different class
-    dfFrequency = y['class'].value_counts(normalize = True)
+    df_frequency = y['class'].value_counts(normalize = True)
     # Formula for Gini
-    gini = 1 - sum(dfFrequency ** 2)
+    gini = 1 - sum(df_frequency ** 2)
     return gini
 
 def gini_index(left, right):
@@ -62,9 +61,9 @@ def gini_index(left, right):
     return: weighted average of gini 
     """
     total = len(left) + len(right)
-    frLeft = len(left)/total
-    frRight = len(right)/total
-    gini = frLeft * gini_group(left) + frRight * gini_group(right)
+    frequency_left = len(left)/total
+    frequency_right = len(right)/total
+    gini = frequency_left * gini_group(left) + frequency_right * gini_group(right)
     return gini
 
 
@@ -75,22 +74,18 @@ def gini_impurity(df):
     return: gini impurity for each feature
     """
     data = df.drop(['class'], axis=1)
-    resultGini = []
-    numKey = 0
+    result_gini = []
     for key in data.keys():
         print('key',key)
         valeurs = split_value(df, key)
-        print('values',valeurs)
-        numSeuil = 0
-        resultGiniInter = []
+        # print('values',valeurs)
+        result_gini_inter = []
         for seuil in valeurs:
             left, right = split(key, seuil, df)
-            resultGiniInter.append(gini_index(left, right))
-            print('gini',gini_index(left, right))
-            numSeuil += 1
-        resultGini.append(resultGiniInter)
-        numKey += 1
-    return resultGini
+            result_gini_inter.append(gini_index(left, right))
+            # print('gini',gini_index(left, right))
+        result_gini.append(result_gini_inter)
+    return result_gini
 
 def best_split_for_all(df):
     """
@@ -99,23 +94,27 @@ def best_split_for_all(df):
     return: best split for each feature
     """
     data = df.drop(['class'], axis=1)
-    resultGini = gini_impurity(df)
-    print('RESULT',resultGini)
+    result_gini = gini_impurity(df)
+    print('RESULT',result_gini)
     result = np.zeros((len(data.keys()),2))
-    numKey = 0
+    number_key = 0
     for key in data.keys():
-        minIndex = np.argmin(resultGini[numKey])
-        result[numKey,0] = split_value(df, key)[minIndex]
-        result[numKey,1] = resultGini[numKey][minIndex]
-        numKey += 1
+        minimum_index = np.argmin(result_gini[number_key])
+        result[number_key,0] = split_value(df, key)[minimum_index]
+        result[number_key,1] = result_gini[number_key][minimum_index]
+        number_key += 1
     return result
 
 def best_split(df):
+    """
+    df: dataframe
+    return: best split for the dataframe
+    """
     result = best_split_for_all(df)
-    scoreGini = result[:,1]
+    score_gini = result[:,1]
     value = result[:,0]
-    minIndex = np.argmin(scoreGini)
-    return (df.keys()[minIndex],value[minIndex],scoreGini[minIndex])
+    minimum_index = np.argmin(score_gini)
+    return (df.keys()[minimum_index],value[minimum_index],score_gini[minimum_index])
 
     
 
@@ -181,7 +180,7 @@ class DecisionTree:
                 node.proba = df['class'].value_counts(normalize = True)
                 node.main_class = node.proba.argmax()
                 col, val, gini = best_split(df)
-                print('resultat du split',col,val,gini)
+                # print('resultat du split',col,val,gini)
                 if gini == 0.0:
                     node.is_leaf = True
                 else:
@@ -201,12 +200,12 @@ class DecisionTree:
                         node.right = TreeNode()
                         node.right.depth = node.depth + 1
                         # we extend the left child
-                        print('################## Enfant 1')
-                        print('left',left.shape)
-                        print('right',right.shape)
+                        # print('################## Enfant 1')
+                        # print('left',left.shape)
+                        # print('right',right.shape)
                         self.extend_node(node.left, left, y_col)
                         # we extend the right child
-                        print('################## Enfant 2')
+                        # print('################## Enfant 2')
                         self.extend_node(node.right, right, y_col)
                         return
 
@@ -233,9 +232,9 @@ if __name__ == "__main__":
     # make pd.DataFrame with the Iris data
     df = pd.DataFrame(data.data, columns = data.feature_names)
     # we create a copy of the dataframe to add the class
-    dfClasse = df.copy()
-    dfClasse['class'] = data.target
-    print(dfClasse.iloc[70])
+    df_classe = df.copy()
+    df_classe['class'] = data.target
+    print(df_classe.iloc[70])
 
     #visual 2D display of the petal lenght according to the sepal width
     plt.figure()
@@ -247,15 +246,15 @@ if __name__ == "__main__":
 
 
     print('---Martin---')
-    left, right = split("petal width (cm)", 2, dfClasse)
+    left, right = split("petal width (cm)", 2, df_classe)
     print(f"Left: {len(left)}")
     print(f"Right: {len(right)}")
     print('coeff',gini_index(left,right))
     # print(gini_impurity(df, 10))
-    print(split_value(dfClasse, 'petal width (cm)'))
-    print(best_split_for_all(dfClasse))
-    print(best_split(dfClasse))
+    print(split_value(df_classe, 'petal width (cm)'))
+    print(best_split_for_all(df_classe))
+    print(best_split(df_classe))
     print('---------------------------------------------------------')
     Tree1 = DecisionTree(5,1)
-    Tree1.fit(dfClasse, 'class')
+    Tree1.fit(df_classe, 'class')
 
