@@ -16,8 +16,10 @@ def split_value(df, key):
 
     # we extract the column
     data = df[key]
+    print('data',data)
+    print('fin')
     # we sort the unique value of the column
-    data = np.sort(data.unique())
+    data = np.sort(data)
     # we create a vector of threshold equal to the mean of two consecutive values
     result = np.zeros(len(data)-1)
     for i in range(len(data)-1):
@@ -78,6 +80,7 @@ def gini_impurity(df):
     for key in data.keys():
         print('key',key)
         valeurs = split_value(df, key)
+        print('values',valeurs)
         numSeuil = 0
         resultGiniInter = []
         for seuil in valeurs:
@@ -232,7 +235,7 @@ if __name__ == "__main__":
     # we create a copy of the dataframe to add the class
     dfClasse = df.copy()
     dfClasse['class'] = data.target
-    # print(dfClasse)
+    print(dfClasse.iloc[70])
 
     #visual 2D display of the petal lenght according to the sepal width
     plt.figure()
