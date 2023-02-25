@@ -155,58 +155,62 @@ class DecisionTree:
     
     def extend_node(self, node, df, y_col):
         """
+        Recursive function to create the tree by extending one node
         node (TreeNode): node to extend
         df (dataframe): dataframe to split
         y_col (string): name of the column to predict (column class)
         """
-        # if the node is a leaf
+        # Base case 
+        # We stop the algorithm when all nodes are leaves
         if node.is_leaf: 
             return # we reached the end of the branch
-        # if the node is not a leaf
         else:
-            # if the node is not a leaf and the maximum depth is reached
-            if self.max_depth is not None and node.depth >= self.max_depth:
+            # We compute the frequency of all class in the node
+            node.proba = df['class'].value_counts(normalize = True)
+            # We determine the main class
+            node.main_class = node.proba.argmax()
+            # We have several case where the node is a leaf
+            # 1) If there is only one class is the node (purety is reached)
+            if node.proba.shape[0] == 1:
+                print('Le noeud est pur')
+                node.is_leaf = True
+                return
+            # 2) If the maximum depth of the tree is reached
+            elif self.max_depth is not None and node.depth >= self.max_depth:
                 print('Profondeur max atteinte')
                 node.is_leaf = True
-                return # we reached the end of the branch
-            # if the number of sample in the node is less than the minimum number of sample
+                return 
+            # 3) If the number of sample in the node is less than the minimum number of sample
             elif len(df) <= self.min_samples:
                 print('Echantillon insuffisant')
                 node.is_leaf = True
                 return
-            # if the node is not a leaf and the maximum depth is not reached and 
-            # the number of sample in the node is greater than the minimum number of sample
+            # When the node is not a leaf
             else:
-                # we split the node
-                node.proba = df['class'].value_counts(normalize = True)
-                node.main_class = node.proba.argmax()
+                # We split the node (column, value and minimal value of gini)
                 col, val, gini = best_split(df)
                 print('resultat du split',col,val,gini)
-                if gini == 0.0:
-                    print('Le noeud est pur')
+                node.split_col = col
+                node.split_value = val
+                left, right = split(node.split_col, node.split_value, df)
+                # If the split is not possible
+                if len(left) == 0 or len(right) == 0:
+                    print('Le split est impossible')
                     node.is_leaf = True
+                    return
+                # If the split is possible
                 else:
-                    node.split_col = col
-                    node.split_value = val
-                    left, right = split(node.split_col, node.split_value, df)
-                    # if the split is not possible
-                    if len(left) == 0 or len(right) == 0:
-                        print('Le split est impossible')
-                        node.is_leaf = True
-                        return
-                    # if the split is possible
-                    else:
-                        # we create the left child
-                        node.left = TreeNode()
-                        node.left.depth = node.depth + 1
-                        # we create the right child
-                        node.right = TreeNode()
-                        node.right.depth = node.depth + 1
-                        # we extend the left child
-                        self.extend_node(node.left, left, y_col)
-                        # we extend the right child
-                        self.extend_node(node.right, right, y_col)
-                        return
+                    # We create the left child
+                    node.left = TreeNode()
+                    node.left.depth = node.depth + 1
+                    # We create the right child
+                    node.right = TreeNode()
+                    node.right.depth = node.depth + 1
+                    # We extend the left child
+                    self.extend_node(node.left, left, y_col)
+                    # We extend the right child
+                    self.extend_node(node.right, right, y_col)
+                    return
 
     def fit(self, df, y_col):
         """
