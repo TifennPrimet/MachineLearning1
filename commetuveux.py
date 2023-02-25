@@ -27,7 +27,6 @@ def split_value(df, key):
         return result
 
 
-
 def split(key, value, df):
     """ 
     key: column name
@@ -53,6 +52,7 @@ def gini_group(y):
     # Formula for Gini
     gini = 1 - sum(df_frequency ** 2)
     return gini
+
 
 def gini_index(left, right):
     """
@@ -87,6 +87,7 @@ def gini_impurity(df):
         result_gini.append(result_gini_inter)
     return result_gini
 
+
 def best_split_for_all(df):
     """
     df: dataframe
@@ -104,6 +105,7 @@ def best_split_for_all(df):
         number_key += 1
     return result
 
+
 def best_split(df):
     """
     df: dataframe
@@ -114,8 +116,6 @@ def best_split(df):
     value = result[:,0]
     minimum_index = np.argmin(score_gini)
     return (df.keys()[minimum_index],value[minimum_index],score_gini[minimum_index])
-
-    
 
 
 class TreeNode:
@@ -215,7 +215,6 @@ class DecisionTree:
         """
         self.tree.depth = 0
         self.extend_node(self.tree, df, y_col)
-
 
     def predict(self, new_df):
         pass
