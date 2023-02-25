@@ -2,16 +2,17 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import doctest
-
 from sklearn import datasets
 
 
 def split_value(df, key):
     """"
     function wich create a vector of threshold possible for a feature
-    df: dataframe
-    key: column name
-    return: vector of threshold
+    :param df: dataframe
+    :type df: pandas.DataFrame
+    :param key: column name
+    :type key: str
+    :return: vector of threshold
     """
     # we extract the column
     data = df[key]
@@ -29,10 +30,13 @@ def split_value(df, key):
 
 def split(key, value, df):
     """ 
-    key: column name
-    value: value to split the data
-    df: dataframe
-    return: left and right dataframe
+    :param key: column name
+    :type key: str
+    :param value: value to split the data
+    :type value: float
+    :param df: dataframe
+    :type df: pandas.DataFrame
+    :return: left and right dataframe
     >>> len(split('sepal width (cm)', 3.0, df)[0])
     57
     """
@@ -44,8 +48,9 @@ def split(key, value, df):
 def gini_group(y):
     """
     Function which calculates the gini impurity of a leaf
-    y: dataframe
-    return: gini coefficient 
+    :param y: dataframe
+    :type y: pandas.DataFrame
+    :return: gini coefficient 
     """
     # Computation of the frequency of the different class
     df_frequency = y['class'].value_counts(normalize = True)
@@ -57,9 +62,11 @@ def gini_group(y):
 def gini_index(left, right):
     """
     Function which calculates the gini impurity of a split
-    left: left dataframe
-    right: right dataframe
-    return: weighted average of gini 
+    :param left: left dataframe
+    :type left: pandas.DataFrame
+    :param right: right dataframe
+    :type right: pandas.DataFrame
+    :return: weighted average of gini 
     """
     total = len(left) + len(right)
     frequency_left = len(left)/total
@@ -70,9 +77,11 @@ def gini_index(left, right):
 
 def gini_impurity(df):
     """
-    df: dataframe
-    nb: number of threshold
-    return: gini impurity for each feature
+    :param df: dataframe
+    :type df: pandas.DataFrame
+    :param nb: number of threshold
+    :type nb: int
+    :return: gini impurity for each feature
     """
     data = df.drop(['class'], axis=1)
     result_gini = []
@@ -90,9 +99,11 @@ def gini_impurity(df):
 
 def best_split_for_all(df):
     """
-    df: dataframe
-    nb: number of threshold
-    return: best split for each feature
+    :param df: dataframe
+    :type df: pandas.DataFrame
+    :param nb: number of threshold
+    :type nb: int
+    :return: best split for each feature
     """
     data = df.drop(['class'], axis=1)
     result_gini = gini_impurity(df)
@@ -108,8 +119,9 @@ def best_split_for_all(df):
 
 def best_split(df):
     """
-    df: dataframe
-    return: best split for the dataframe
+    :param df: dataframe
+    :type df: pandas.DataFrame
+    :return: best split for the dataframe
     """
     result = best_split_for_all(df)
     score_gini = result[:,1]
@@ -145,9 +157,12 @@ class TreeNode:
 class DecisionTree:
     def __init__(self, max_depth = None, min_samples = 1):
         """
-        tree (TreeNode): root of the tree
-        max_depth (int): maximum depth of the tree
-        min_samples (int): minimum number of samples in a leaf
+        tree : root of the tree
+        :type tree: TreeNode
+        max_depth : maximum depth of the tree
+        :type max_depth: int
+        min_samples : minimum number of samples in a leaf
+        :type min_samples: int
         """
         self.tree = TreeNode()
         self.max_depth = max_depth
@@ -155,15 +170,16 @@ class DecisionTree:
     
     def extend_node(self, node, df, y_col):
         """
-        Recursive function to create the tree by extending one node
-        node (TreeNode): node to extend
-        df (dataframe): dataframe to split
-        y_col (string): name of the column to predict (column class)
+        :param node : node to extend
+        :type node: TreeNode
+        :param df : dataframe to split
+        :type df: pandas.DataFrame
+        :param y_col : name of the column to predict (column class)
+        :type y_col: str
         """
-        # Base case 
-        # We stop the algorithm when all nodes are leaves
         if node.is_leaf: 
             return # we reached the end of the branch
+        # if the node is not a leaf
         else:
             # We compute the frequency of all class in the node
             node.proba = df['class'].value_counts(normalize = True)
@@ -179,43 +195,46 @@ class DecisionTree:
             elif self.max_depth is not None and node.depth >= self.max_depth:
                 print('Profondeur max atteinte')
                 node.is_leaf = True
-                return 
-            # 3) If the number of sample in the node is less than the minimum number of sample
+                return # we reached the end of the branch
+            # if the number of sample in the node is less than the minimum number of sample
             elif len(df) <= self.min_samples:
                 print('Echantillon insuffisant')
                 node.is_leaf = True
                 return
-            # When the node is not a leaf
+            # if the node is not a leaf and the maximum depth is not reached and 
+            # the number of sample in the node is greater than the minimum number of sample
             else:
-                # We split the node (column, value and minimal value of gini)
+                # we split the node
                 col, val, gini = best_split(df)
                 print('resultat du split',col,val,gini)
                 node.split_col = col
                 node.split_value = val
                 left, right = split(node.split_col, node.split_value, df)
-                # If the split is not possible
+                # if the split is not possible
                 if len(left) == 0 or len(right) == 0:
                     print('Le split est impossible')
                     node.is_leaf = True
                     return
-                # If the split is possible
+                # if the split is possible
                 else:
-                    # We create the left child
+                    # we create the left child
                     node.left = TreeNode()
                     node.left.depth = node.depth + 1
-                    # We create the right child
+                    # we create the right child
                     node.right = TreeNode()
                     node.right.depth = node.depth + 1
-                    # We extend the left child
+                    # we extend the left child
                     self.extend_node(node.left, left, y_col)
-                    # We extend the right child
+                    # we extend the right child
                     self.extend_node(node.right, right, y_col)
-                    return
+                    
 
     def fit(self, df, y_col):
         """
-        df (dataframe): dataframe to split
-        y_col (string): name of the column to predict (column class)
+        :param df : dataframe to split
+        :type df: pandas.DataFrame§
+        :param y_col :  name of the column to predict (column class)
+        :type y_col: str
         """
         self.tree.depth = 0
         self.extend_node(self.tree, df, y_col)
@@ -243,16 +262,16 @@ if __name__ == "__main__":
     x = df['petal width (cm)']
     y = df['petal length (cm)']
     plt.scatter(x, y, c = data.target)
-    plt.plot(x,2.45*np.ones(len(x))) # Premier split
-    plt.plot(1.75*np.ones(len(y)),y) # Deuxième split
-    plt.plot(x,4.85*np.ones(len(x))) # Troisième split
-    plt.plot(x,4.95*np.ones(len(x))) # Quatrième split
-    plt.plot(1.55*np.ones(len(y)),y) # Cinquième split
-    plt.plot()
+    # plt.plot(x,2.45*np.ones(len(x))) # Premier split
+    # plt.plot(1.75*np.ones(len(y)),y) # Deuxième split
+    # plt.plot(x,4.85*np.ones(len(x))) # Troisième split
+    # plt.plot(x,4.95*np.ones(len(x))) # Quatrième split
+    # plt.plot(1.55*np.ones(len(y)),y) # Cinquième split
+    # plt.plot()
     plt.xlabel('petal width (cm)')
     plt.ylabel('petal length (cm)')
     plt.title('Iris dataset')
-    # plt.show()
+    plt.show()
 
 
     print('---Martin---')
