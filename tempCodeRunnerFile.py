@@ -1,21 +1,6 @@
-    #visual 2D display of the petal lenght according to the sepal width
-    plt.figure()
-    plt.scatter(df['sepal width (cm)'], df['petal length (cm)'], c = data.target)
-    plt.xlabel('sepal width (cm)')
-    plt.ylabel('petal length (cm)')
-    plt.title('Iris dataset')
-    # plt.show()
-
-
-    print('---Martin---')
-    left, right = split("petal width (cm)", 2, dfClasse)
-    print(f"Left: {len(left)}")
-    print(f"Right: {len(right)}")
-    print('coeff',gini_index(left,right))
-    # print(gini_impurity(df, 10))
-    print(split_value(dfClasse, 'petal width (cm)'))
-    print(best_split_for_all(dfClasse))
-    print(best_split(dfClasse))
-    print('---------------------------------------------------------')
-    # Tree1 = DecisionTree(5,1)
-    # Tree1.fit(dfClasse, 'class')
+figs, axs = plt.subplots(2,np.floor[len(v_rate)/2])
+# j = 0
+# for k in range(len(v_rate)):
+#     if k == np.floor(len(v_rate)/2):
+#         j += 1
+#     sns.boxplot(data=lst_matrix[k], ax=axs[j,k])

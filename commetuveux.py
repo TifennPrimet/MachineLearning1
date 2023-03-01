@@ -4,7 +4,9 @@ import matplotlib.pyplot as plt
 import doctest
 from sklearn import datasets
 
-
+# =============================================================================
+# 
+# =============================================================================
 def split_value(df, key):
     """"
     function wich create a vector of threshold possible for a feature
