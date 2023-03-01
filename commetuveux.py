@@ -192,7 +192,7 @@ class DecisionTree:
             # We compute the frequency of all class in the node
             node.proba = df['class'].value_counts(normalize = True)
             # We determine the main class
-            node.main_class = node.proba.argmax()
+            node.main_class = node.proba.idxmax()
             # We have several case where the node is a leaf
             # 1) If there is only one class is the node (purety is reached)
             if node.proba.shape[0] == 1:
