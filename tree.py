@@ -46,15 +46,6 @@ class DecisionTree:
     
     def extend_node(self, node, df, y_col):
         """
-        :param node : node to extend
-        :type node: TreeNode
-        :param df : dataframe to split
-        :type df: pandas.DataFrame
-        :param y_col : name of the column to predict (column class)
-        :type y_col: str
-        """
-    def extend_node(self, node, df, y_col):
-        """
         Recursive function to create the tree by extending one node
         node (TreeNode): node to extend
         df (dataframe): dataframe to split
