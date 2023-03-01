@@ -265,7 +265,38 @@ class DecisionTree:
             result[i] = node.main_class
         return result
 
-      
+    def display_tree(self, y_col) :
+        """
+        Function which prints the tree
+        : param y_col : name of the column to predict (column class)
+        : type y_col: str
+        """
+        def display_node(node, y_col) :
+            """
+            Recursive function to print the tree
+            : param node : node to print
+            : type node: TreeNode
+            : param y_col : name of the column to predict (column class)
+            : type y_col: str
+            """
+            if node.is_leaf:
+                return [f"  {node.main_class}  "]
+            
+            cut1 = f"{node.split_col}"
+            len_cut_1 = len(cut1)
+            cut2 = f"{node.split_value}"
+            len_cut_2 = len(cut2)
+            left = display_node(node.left, y_col)
+            len_left = len(left[0])
+            right = display_node(node.right, y_col)
+            len_right = len(right[0])
+            max_len_left = max(len_cut_1//2, len_cut_2//2, len_left)
+            max_len_right = max((len_cut_1-1)//2, (len_cut_2-1)//2, len_right)
+            tab1 = ["-"*(max_len_left-len_cut_1//2)+cut1+"-"*(max_len_right-(len_cut_1-1)//2), " "*(max_len_left-len_cut_2//2)+cut2+" "*(max_len_right-(len_cut_2-1)//2)]
+            tab2 = [" "*(max_len_left-len_left)+(left[i] if i < len(left) else " "*len_left)+"|"+(right[i] if i < len(right) else " "*len_right)+" "*(max_len_right-len_right) for i in range(max(len(left),len(right)))]
+            return tab1 + tab2 
+        
+        print("\n".join([f"|{line}|" for line in display_node(self.tree, y_col)]))     
 
 
 if __name__ == "__main__":
@@ -319,4 +350,5 @@ if __name__ == "__main__":
     Tree.fit(df_a_classer,'class')
     result = Tree.predict(df_new)
     df_new.insert(df_new.shape[1],'Prediction',result)
+    Tree.display_tree('class')
 
