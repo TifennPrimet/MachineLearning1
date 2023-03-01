@@ -201,11 +201,3 @@ if __name__ == "__main__":
     result = Tree.predict(df_new)
     # We add the prediction to the dataframe
     df_new.insert(df_new.shape[1],'Prediction',result)
-    # We print the accuracy of the dataframe
-    print(accuracy(df_new, 'class', 'Prediction'))
-
-    # We compute the accuracy of the model with cross validation
-    cross = cross_validation(df_classe,'class',10)
-    print('cross validation', cross)
-    print('Moyenne cross validation', np.mean(cross))
-    print('Variance type cross validation', np.sqrt(np.std(cross)))
