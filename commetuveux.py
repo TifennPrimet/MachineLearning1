@@ -298,6 +298,9 @@ class DecisionTree:
         
         print("\n".join([f"|{line}|" for line in display_node(self.tree, y_col)]))     
 
+def accuracy(df,y_class,y_pred):
+    res = df_new[y_class] == df_new[y_pred]
+    return sum(res)/res.shape[0]*100
 
 if __name__ == "__main__":
     # doctest.testmod()
@@ -351,4 +354,6 @@ if __name__ == "__main__":
     result = Tree.predict(df_new)
     df_new.insert(df_new.shape[1],'Prediction',result)
     Tree.display_tree('class')
+    
+    print(accuracy(df_new, 'class', 'Prediction'))
 
