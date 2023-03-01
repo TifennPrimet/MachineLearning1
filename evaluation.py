@@ -10,14 +10,26 @@ color=LinearSegmentedColormap.from_list('rg',["lightcoral", "white", "palegreen"
 from tree import DecisionTree
 
 def accuracy(df,y_class,y_pred):
+    """
+    Function that compute the prediction accuracy 
+    :param df : predicted dataframe 
+    :type df: pandas.DataFrame
+    :param y_class : name of the predicted column (column class)
+    :type y_class: str
+    :param y_pred : name of the column predicted (column prediction)
+    :type y_pred: str
+    :return: accuracy of the model
+    :rtype: float
+    """
     res = df[y_class] == df[y_pred]
     return sum(res)/res.shape[0]*100
 
 def cross_validation(df,y_col,k):
     """
-    :param df : dataframe to split
+    Function that compute the cross validation of a model
+    :param df :  dataframe to predict
     :type df: pandas.DataFrame
-    :param y_col :  name of the column to predict (column class)
+    :param y_col :  name of the column to class the tree(column class)
     :type y_col: str
     :param k : number of folds
     :type k: int
@@ -32,26 +44,26 @@ def cross_validation(df,y_col,k):
     accuracy_list = []
     # We create a DecisionTree
     Tree = DecisionTree()
-    # We iterate on the folds
+    # We iterate on each fold
     for i in range(k):
         # We take the fold i to test the model
         df_new = df_split[i].copy()
         # We take the other folds to train the model
         df_a_classer = pd.concat(df_split[:i]+df_split[i+1:])
-        # We fit the model
         Tree.fit(df_a_classer,y_col)
         # We predict the class of the fold i
         df_new['prediction'] = Tree.predict(df_new)
         # We compute the accuracy of the model
         accuracy_list.append(accuracy(df_new,y_col,'prediction'))
-    # We return the mean of the accuracy of each fold
+    # We return list of the accuracy of each fold
     return accuracy_list
 
 def confusion_matrix(df,y_class,y_pred):
     """
-    :param df : dataframe to split
+    Function that compute the confusion matrix of a model
+    :param df : predicted dataframe 
     :type df: pandas.DataFrame
-    :param y_class : name of the column to predict (column class)
+    :param y_class : name of the column use to predict (column class)
     :type y_class: str
     :param y_pred : name of the column predicted (column prediction)
     :type y_pred: str
@@ -62,6 +74,7 @@ def confusion_matrix(df,y_class,y_pred):
     pred = df[y_pred]
     nb_class = 3
     matrix = np.zeros((nb_class,nb_class))
+    # We iterate on each row of the dataframe to compute the confusion matrix
     for i in range(len(classe)):
         matrix[classe.iloc[i]][int(pred.iloc[i])] += 1
     return matrix
