@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import doctest
+import random
 from sklearn import datasets
 
 
@@ -247,7 +248,22 @@ class DecisionTree:
         self.extend_node(self.tree, df, y_col)
 
     def predict(self, new_df):
-        pass
+        """
+        :param new_df : dataframe to predict
+        :type new_df: pandas.DataFrame
+        :return: prediction for the dataframe
+        :rtype: array
+        """
+        result = np.zeros(len(new_df))
+        for i in range(len(new_df)):
+            node = self.tree
+            while not node.is_leaf:
+                if new_df[node.split_col].iloc[i] < node.split_value:
+                    node = node.left
+                else:
+                    node = node.right
+            result[i] = node.main_class
+        return result
 
       
 
@@ -263,6 +279,8 @@ if __name__ == "__main__":
     df_classe = df.copy()
     df_classe['class'] = data.target
     # print(df_classe)
+    
+    df_shuffle = df_classe.sample(frac = 1)
 
     #visual 2D display of the petal lenght according to the sepal width
     plt.figure()
@@ -291,6 +309,14 @@ if __name__ == "__main__":
     print(best_split_for_all(df_classe))
     print(best_split(df_classe))
     print('---------------------------------------------------------')
-    Tree1 = DecisionTree()
-    Tree1.fit(df_classe, 'class')
+    # Tree1 = DecisionTree()
+    # Tree1.fit(df_classe, 'class')
+    
+    print('------------- Le temps du melange --------------')
+    df_a_classer = df_shuffle.head(100)
+    df_new = df_shuffle.tail(50)
+    Tree = DecisionTree()
+    Tree.fit(df_a_classer,'class')
+    result = Tree.predict(df_new)
+    df_new.insert(df_new.shape[1],'Prediction',result)
 
