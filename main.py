@@ -80,7 +80,7 @@ def stratified_split(df, y_col, nb):
     print('Pourcentage of accuracy',accuracy(df_new, y_col, 'Prediction'))
     return df_new
 
-def rate(df,treshold):
+def rate(df,threshold):
     """
     function wich train a model with a random selection of a certain percentage of the dataframe and test the model with the rest of the dataframe
     :param df : dataframe to split
@@ -90,7 +90,7 @@ def rate(df,treshold):
     :return: dataframe with the prediction
     :rtype: pandas.DataFrame
     """
-    proportion = int(np.floor(df.shape[0]*treshold))
+    proportion = int(np.floor(df.shape[0]*threshold))
     df_a_classer = df.head(proportion)
     df_new = df.tail(df.shape[0]-proportion)
     Tree = DecisionTree()
@@ -101,9 +101,10 @@ def rate(df,treshold):
     df_new.insert(df_new.shape[1],'Prediction',result)
     # Matrix confusion
     matrix = confusion_matrix(df_new, 'class', 'Prediction')
+    total_pred = np.sum(matrix)
     true = np.trace(matrix)
-    false = np.sum(matrix) - true
-    return [true,false,matrix]
+    false = total_pred - true
+    return [true/total_pred,false/total_pred,matrix]
 
 
 if __name__ == "__main__":
@@ -147,11 +148,11 @@ if __name__ == "__main__":
     ax1.plot(v_rate, v_true)
     ax1.set_title('True predictions')
     ax1.set_xlabel('Percentage of data trained')
-    ax1.set_ylabel('Number of elements')
+    ax1.set_ylabel('Percentage of elements')
     ax2.plot(v_rate, v_false)
     ax2.set_title('False predictions')
     ax2.set_xlabel('Percentage of data trained')
-    ax2.set_ylabel('Number of elements')
+    ax2.set_ylabel('Percentage of elements')
     
     #plot of the confusion matrix
     figs, axs = plt.subplots(2,int(np.ceil(len(v_rate)/2)))

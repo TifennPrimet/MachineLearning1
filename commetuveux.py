@@ -317,20 +317,25 @@ if __name__ == "__main__":
     
     df_shuffle = df_classe.sample(frac = 1)
 
+    
     #visual 2D display of the petal lenght according to the sepal width
     plt.figure()
     x = df['petal width (cm)']
     y = df['petal length (cm)']
+    
+    ty = max(y) - min(y)
+    
     plt.scatter(x, y, c = data.target)
-    # plt.plot(x,2.45*np.ones(len(x))) # Premier split
-    # plt.plot(1.75*np.ones(len(y)),y) # Deuxième split
-    # plt.plot(x,4.85*np.ones(len(x))) # Troisième split
-    # plt.plot(x,4.95*np.ones(len(x))) # Quatrième split
-    # plt.plot(1.55*np.ones(len(y)),y) # Cinquième split
-    # plt.plot()
+    plt.plot(x,2.45*np.ones(len(x)),label='Premier split') # Premier split
+    plt.plot(1.75*np.ones(len(y)),y,label='Deuxième split') # Deuxième split
+    plt.plot(x,4.85*np.ones(len(x)),label='Troisième split') # Troisième split
+    plt.plot(x,4.95*np.ones(len(x)),label='Quatrième split') # Quatrième split
+    plt.plot(1.55*np.ones(len(y)),y,label='Cinquième split') # Cinquième split
+    plt.plot()
     plt.xlabel('petal width (cm)')
     plt.ylabel('petal length (cm)')
     plt.title('Iris dataset')
+    plt.legend()
     plt.show()
 
 
