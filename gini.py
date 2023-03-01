@@ -92,12 +92,10 @@ def gini_impurity(df):
     result_gini = []
     for key in data.keys():
         valeurs = split_value(df, key)
-        # print('values',valeurs)
         result_gini_inter = []
         for seuil in valeurs:
             left, right = split(key, seuil, df)
             result_gini_inter.append(gini_index(left, right))
-            # print('gini',gini_index(left, right))
         result_gini.append(result_gini_inter)
     return result_gini
 
